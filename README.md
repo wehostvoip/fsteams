@@ -27,7 +27,7 @@ https://freeswitch.org/confluence/display/FREESWITCH/Debian+Post-Install+Tasks
 You will have to open the system for the microsoft ranges, below an example using ufw, please adapt it to your own environment. If you are running our AMI in AWS, the security group is already configured. Assuming the TCP port is 5067.
 
 #### Example
-
+```
 #temporary for Let's encrypt
 ufw allow port 80/tcp
 
@@ -42,6 +42,7 @@ ufw allow in from 52.114.14.70/32 to any port 5067 proto tcp
 ufw allow in from 52.114.132.46/32 to any port 5067 proto tcp
 #media
 ufw allow in from 52.112.0.0/14 to any port 16384:32768 proto udp
+```
 
 ### 4 - FreeSwitch Configuration
 
