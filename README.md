@@ -66,7 +66,7 @@ ln -s /snap/bin/certbot /usr/bin/certbot
 certbot certonly --standalone
 ```
 
-Answer the questions according to your own domain. 
+Answer the questions according to your own domain. Then copy the certificates to the FreeSwitch directory.
 
 ```
 cat /etc/letsencrypt/live/<your-domain>/fullchain.pem >/etc/freeswitch/tls/agent.pem
