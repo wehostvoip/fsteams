@@ -1,14 +1,16 @@
 ## Teams Gateway
 
-The purpose of gateway teams is to convert UDP/RTP traffic to TLS/SRTP and allow MS Teams forward signaling. For it to operate a series of steps are necessary
+The purpose of gateway teams is to convert UDP/RTP traffic to TLS/SRTP and allow MS Teams forward signaling. For the operation you will have to follow a series of steps carefully. 
 
 ## FreeSwitch Compilation
 
-### 1 - Download the fsteams project into the /usr/src directory
+### 1 - Check if you have the directory /usr/src/freeswitch-teams
 
-git clone https://gitlab.sippulse.com/flavio/freeswitch-teams.git
+cd /usr/src/freeswitch-teams/freeswitch
 
 ### 2 - The FreeSwitch contained in the project must be compiled on a Debian 10 platform. It contains modification in the sofia module to allow the refer without a username and add the domain in Contact
+
+In the direcotry /usr/src/freeswitch-teams/freeswitch
 
 ```shell
 ./bootstrap.sh -j
@@ -18,7 +20,7 @@ make install
 make samples
 ```
 
-Follow post installation tasks from this link. 
+Follow post installation tasks from this link to enable FreeSwitch restart use the service example in the webpage instead of the one in the source code. 
 
 https://freeswitch.org/confluence/display/FREESWITCH/Debian+Post-Install+Tasks
 
@@ -82,7 +84,7 @@ Use the example below as a default
 ```
 divert(-1)
 define(`PIPE_NAME', `')                               #Simple Pipe Name
-define(`PIPE_PORT', `5060')                           #SBC SIP port
+define(`PIPE_PORT', `5067')                           #SBC SIP port
 define(`SBC_FQDN', `')                                #SBC Fully Qualified Domain Name
 define(`VP_HOST', `')                                 #SIP Trunk Host
 define(`VP_IP', `')                                   #SIP Trunk IP
