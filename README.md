@@ -105,7 +105,7 @@ define(`TE_OUTBOUND_REPLACE', `11740')                          - #Replace numbe
 divert(0)dnl
 ``` 
 
-### 7 - Create the pipes using inside the config directory.
+### 7 - Create the pipes in the configuration. PIPE is our metaphor for a SIP peer to peer connection between two entities. 
 
 ```
 ./install_pipe.sh <pipe_name>
