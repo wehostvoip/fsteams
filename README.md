@@ -155,40 +155,54 @@ In SBC FQDN, you must use the SBC pipe name and designated signaling port. The n
 New-CsOnlinePSTNGateway -Fqdn <SBC FQDN> -SipSignalingPort <SBC SIP Port> -MaxConcurrentSessions <Max Concurrent Sessions the SBC can handle> -Enabled $true -Bypass $false
 ```
 
-
 The SBC can take up to 60 minutes to become operational
 
-Step 4: Enable Microsoft Phone System licenses for users in the Office 365 admin interface
+### 12 - Enable Microsoft Phone System licenses for users in the Office 365 admin interface
 
-Step 5: Enable user to use phone number and enterprise voice feature
+### 13 - Enable user to use phone number and enterprise voice feature
 
+```
 Set-CsUser -Identity "<User name>" -EnterpriseVoiceEnabled $true -HostedVoiceMail $true -OnPremLineURI tel:<E.164 phone number>
 Example:
 
 Set-CsUser -Identity "spencer.low@contoso.com" -OnPremLineURI tel:+14255388797 -EnterpriseVoiceEnabled $true -HostedVoiceMail $true
+```
 
 It may take from a few minutes to a few hours before the user can see the calls menu on their MS Teams screen.
 
-Step 7: Create PSTN Usages
+### 14 - Create PSTN Usages
 
 Let's use three PSTN Usages
 Local
 Long distance
 International
 Hierarchically, those who have internationals have the two below.
+
+```
 Set-CsOnlinePstnUsage -Identity Global -Usage @{Add="Local"}
 Set-CsOnlinePstnUsage -Identity Global -Usage @{Add="Long Distance"}
 Set-CsOnlinePstnUsage -Identity Global -Usage @{Add="International"}
-
+```
+  
 To check, use:
+```
 Get-CSOnlinePSTNUsage
-
-Step 8: Create the voice routes
+```
+  
+### 15 - Create the voice routes
 
 Local
+```
 New-CsOnlineVoiceRoute -Identity "Local" -NumberPattern "^\+5548(\d{8,9})$" -OnlinePstnGatewayList sbc3.contoso.biz, sbc4.contoso.biz -Priority 1 -OnlinePstnUsages "Local"
-Long distance
-New-CsOnlineVoiceRoute -Identity "Long Distance" -NumberPattern "^\+55[1-9][1-9](\d{8,9})$" -OnlinePstnGatewayList sbc3.contoso.biz, sbc4.contoso.biz -Priority 1 -OnlinePstnUsages "Long Distance"
-International (When possible do not enable international calls, to avoid fraud or set more restricted destinations)
-New-CsOnlineVoiceRoute -Identity "Internacional LD" -NumberPattern
+```
 
+Long distance
+```
+New-CsOnlineVoiceRoute -Identity "Long Distance" -NumberPattern "^\+55[1-9][1-9](\d{8,9})$" -OnlinePstnGatewayList sbc3.contoso.biz, sbc4.contoso.biz -Priority 1 -OnlinePstnUsages "Long Distance"
+```
+
+International (When possible do not enable international calls, to avoid fraud or set more restricted destinations)
+
+```
+New-CsOnlineVoiceRoute -Identity "Internacional LD" -NumberPattern
+```
