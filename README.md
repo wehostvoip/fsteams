@@ -1,4 +1,4 @@
-## Teams Gateway
+## Mircosoft Teams Direct Routing Gateway
 
 The purpose of gateway teams is to convert UDP/RTP traffic to TLS/SRTP and allow MS Teams forward signaling. For the operation you will have to follow a series of steps carefully. 
 
