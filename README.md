@@ -57,7 +57,7 @@ cd /usr/src/freeswitch-teams/config
 ./install.sh
 ``` 
 
-### 5 - Generate the digital certificate and add it to FreeSwitch certificates
+### 5 - Generate the digital certificate and copy then to the freeswitch directory
 
 Install certbot
 
@@ -71,6 +71,7 @@ certbot certonly --standalone
 Answer the questions according to your own domain. Then copy the certificates to the FreeSwitch directory.
 
 ```
+mkdir /etc/freeswitch/tls
 cat /etc/letsencrypt/live/<your-domain>/fullchain.pem >/etc/freeswitch/tls/agent.pem
 cat /etc/letsencrypt/live/<your-domain>/privkey.pem >>/etc/freeswitch/tls/agent.pem
 cat tls/bc2025.pem >>/etc/freeswitch/tls/cafile.pem
