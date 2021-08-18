@@ -11,75 +11,150 @@ git clone https://gitlab.sippulse.com/flavio/freeswitch-teams.git
 ### 2 - The FreeSwitch contained in the project must be compiled on a Debian 10 platform. It contains modification in the sofia module to allow the refer without a username and add the domain in Contact
 
 ```shell
+./bootstrap.sh -j
 ./configure
 make
 make install
-make config
 make samples
 ```
 
-3 - FreeSwitch Configuration
+Follow post installation tasks from this link. 
+
+https://freeswitch.org/confluence/display/FREESWITCH/Debian+Post-Install+Tasks
+
+### 3 - Firewall Configuration. 
+
+You will have to open the system for the microsoft ranges, below an example using ufw, please adapt it to your own environment. If you are running our AMI in AWS, the security group is already configured. Assuming the TCP port is 5067.
+
+#### Example
+
+#temporary for Let's encrypt
+ufw allow port 80/tcp
+
+#open firewall for MS Teams
+#signaling
+ufw allow in from 189.90.58.142  to any port 5067  proto tcp
+ufw allow in from 52.114.148.0/32 to any port 5067  proto tcp
+ufw allow in from 52.114.75.24/32 to any port 5067 proto tcp
+ufw allow in from 52.114.76.76/32 to any port 5067 proto tcp
+ufw allow in from 52.114.7.24/32 to any port 5067 proto tcp
+ufw allow in from 52.114.14.70/32 to any port 5067 proto tcp
+ufw allow in from 52.114.132.46/32 to any port 5067 proto tcp
+#media
+ufw allow in from 52.112.0.0/14 to any port 16384:32768 proto udp
+
+### 4 - FreeSwitch Configuration
 
 In the /usr/src/freeswitch-teams directory run the install.sh program, this program will clear the default configuration fo Freeswitch and remove unnecessary profiles and dial plans
-cd config
+
+```
+cd /etc
+ln -s /usr/local/freeswitch/conf freeswitch
+cd /usr/src/freeswitch-teams/config
 ./install.sh
+``` 
 
-4 - Generate the digital certificate and add it to FreeSwitch certificates
+### 5 - Generate the digital certificate and add it to FreeSwitch certificates
 
+Install certbot
+
+```
+apt install snap snapd
+snap install --classic certbot
+ln -s /snap/bin/certbot /usr/bin/certbot
+certbot certonly --standalone
+```
+
+Answer the questions according to your own domain. 
+
+```
 cat /etc/letsencrypt/live/<your-domain>/fullchain.pem >/etc/freeswitch/tls/agent.pem
 cat /etc/letsencrypt/live/<your-domain>/privkey.pem >>/etc/freeswitch/tls/agent.pem
 cat tls/bc2025.pem >>/etc/freeswitch/tls/cafile.pem
 cat tls/dstroot.pem >>/etc/freeswitch/tls/cafile.pem
 cat /etc/letsencrypt/live/wehostvoice.com/cert.pem >>/etc/freeswitch/tls/cafile.pem
+```
 
-5 - Edit the local.m4 file and customize your environment.
+### 6 - Edit the local.m4 file and customize your environment.
 Use the example below as a default
 
+```
 divert(-1)
-define(`PIPE_NAME', `tga')
-define(`PIPE_PORT', `5060')
-define(`SBC_FQDN', `tga.wehostvoice.com')
-define(`VP_HOST', `ssw.api4com.com')
-define(`VP_IP', `18.228.131.161')
-define(`VP_PORT', `9999')
-define(`VP_USERNAME', `tgw')
-define(`VP_PASSWORD', `#supersupersecret#')
-define(`VP_PROTOCOL', `UDP')
-define(`VP_CODEC_STRING', `SILK,PCMU,PCMA')
-define(`TEAMS_CODEC_STRING', `SILK,PCMU,PCMA')
-define(`VP_INBOUND_MATCH', `^(4833328[0-9]{3})$')
-define(`VP_OUTBOUND_REPLACE', `+55')
-define(`VP_REGISTER', `false')
-define(`REFER', `true')
-define(`TE_INBOUND_MATCH', `^\+55([2-9][0-9][2-9][0-9]{7,8})$')
-define(`TE_OUTBOUND_REPLACE', `11740')
+define(`PIPE_NAME', `')                               #Simple Pipe Name
+define(`PIPE_PORT', `5060')                           #SBC SIP port
+define(`SBC_FQDN', `')                                #SBC Fully Qualified Domain Name
+define(`VP_HOST', `')                                 #SIP Trunk Host
+define(`VP_IP', `')                                   #SIP Trunk IP
+define(`VP_PORT', `9999')                             #SIP Trunk Port
+define(`VP_USERNAME', `tgw')                          #SIP Trunk Username
+define(`VP_PASSWORD', `##')                           #SIP Trunk Password
+define(`VP_PROTOCOL', `UDP')                          #SIP Trunk Protocol
+define(`VP_CODEC_STRING', `SILK,PCMU,PCMA')           #SIP Trunk Codec
+define(`TEAMS_CODEC_STRING', `SILK,PCMU,PCMA')        #Teams CODECs
+define(`VP_INBOUND_MATCH', `^(4833328[0-9]{3})$')     #Inbound Match for numbers coming from SIP Provider
+define(`VP_OUTBOUND_REPLACE', `+55')                  #Replace for numbers coming from SIP Provider
+define(`VP_REGISTER', `false')                                    #Register in the SIP trunk
+define(`REFER', `true')                                           #Use REFER
+define(`TE_INBOUND_MATCH', `^\+55([2-9][0-9][2-9][0-9]{7,8})$') - #Inbound Match for numbers coming from MS Teams
+define(`TE_OUTBOUND_REPLACE', `11740')                          - #Replace numbers coming from TEAMS
 divert(0)dnl
+``` 
 
-7 - Create the pipes using inside the config directory.
+### 7 - Create the pipes using inside the config directory.
+
+```
 ./install_pipe.sh <pipe_name>
 
 Example:
+```
+
+```
 ./install_pipe.sh tga
+```
 
-8 - Restart Freeswitch after the changes.
+### 8 - Restart Freeswitch after the changes.
 
-Microsoft Teams Tenant Configuration
+### 9  - Microsoft Teams Tenant Configuration
 
 Step 1: You must use Microsoft Powershell, Windows or Linux version to configure Tenant Microsoft Teams. For this you need to download Skype for Business Connector
 
-See instructions at:
+```
+Install-Module -Name PowerShellGet -Force -AllowClobber
+```
 
-https://docs.microsoft.com/en-us/SkypeForBusiness/set-up-your-computer-for-windows-powershell/download-and-install-the-skype-for-business-online-connector
+Answer yes to all questions
 
-Step 2: Login to Microsoft tenant from Powershell (takes a while to load)
-Import-Module SkypeOnlineConnector
-$userCredential = Get-Credential
-$sfbSession = New-CsOnlineSession -Credential $userCredential
-Import-PSSession $sfbSession
+```
+Connect-MicrosoftTeams
+```
 
-Step 3: Create SBC on MS Teams
+### 10 - Add the domain of your SBC
+
+![image](https://user-images.githubusercontent.com/4958202/129860930-1cd6ca1e-a936-4c8d-9df0-d46472ce03a4.png)
+
+Verify by adding a txt to your DNS server
+
+![image](https://user-images.githubusercontent.com/4958202/129861200-a7319799-7259-4fc3-b2a7-d0ea479ebd2e.png)
+
+Create the required DNS records for the SBC
+
+![image](https://user-images.githubusercontent.com/4958202/129864130-1f7a8cc8-af40-4bfa-8d07-42d71eccc004.png)
+
+If using cloudflare, Microsoft adds them automatically, if using another DNS server you will have to add them manually
+
+At the end your domain should be completed 
+
+![image](https://user-images.githubusercontent.com/4958202/129864537-1f5d5bda-34c1-4636-b33a-08f94fa3079c.png)
+
+### 11 - Create the SBC gateway using the command below 
+
 In SBC FQDN, you must use the SBC pipe name and designated signaling port. The number of simultaneous connections must also be added.
-New-CsOnlinePSTNGateway -Fqdn <SBC FQDN> -SipSignalingPort <SBC SIP Port> -MaxConcurrentSessions <Max Concurrent Sessions the SBC can handle> -Enabled $true -Bypass $true
+
+```
+New-CsOnlinePSTNGateway -Fqdn <SBC FQDN> -SipSignalingPort <SBC SIP Port> -MaxConcurrentSessions <Max Concurrent Sessions the SBC can handle> -Enabled $true -Bypass $false
+```
+
+
 The SBC can take up to 60 minutes to become operational
 
 Step 4: Enable Microsoft Phone System licenses for users in the Office 365 admin interface
