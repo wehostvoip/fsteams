@@ -121,7 +121,7 @@ Example:
 
 ### 9  - Microsoft Teams Tenant Configuration
 
-Step 1: You must use Microsoft Powershell, Windows or Linux version to configure Tenant Microsoft Teams. For this you need to download Skype for Business Connector
+Step 1: You must use Microsoft Powershell, Windows or Linux version to configure Tenant Microsoft Teams. For this you need to download the Teams Connector. Use PowerShell in administrator mode. 
 
 ```
 Install-Module -Name PowerShellGet -Force -AllowClobber
