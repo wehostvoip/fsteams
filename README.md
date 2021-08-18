@@ -74,9 +74,10 @@ Answer the questions according to your own domain. Then copy the certificates to
 mkdir /etc/freeswitch/tls
 cat /etc/letsencrypt/live/<your-domain>/fullchain.pem >/etc/freeswitch/tls/agent.pem
 cat /etc/letsencrypt/live/<your-domain>/privkey.pem >>/etc/freeswitch/tls/agent.pem
+cat /etc/letsencrypt/live/<your-domain>/cert.pem >>/etc/freeswitch/tls/cafile.pem
+cd /usr/src/freeswitch-teams/config
 cat tls/bc2025.pem >>/etc/freeswitch/tls/cafile.pem
 cat tls/dstroot.pem >>/etc/freeswitch/tls/cafile.pem
-cat /etc/letsencrypt/live/wehostvoice.com/cert.pem >>/etc/freeswitch/tls/cafile.pem
 ```
 
 ### 6 - Edit the local.m4 file and customize your environment.
