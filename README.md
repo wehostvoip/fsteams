@@ -8,7 +8,7 @@ The purpose of gateway teams is to convert UDP/RTP traffic to TLS/SRTP and allow
 
 cd /usr/src/freeswitch-teams/freeswitch
 
-### 2 - The FreeSwitch contained in the project must be compiled on a Debian 10 platform. It contains modification in the sofia module to allow the refer without a username and add the domain in Contact
+### 2 - The FreeSwitch contained in the project must be compiled on a Debian 10 platform. It contains a few modifications in the sofia module to properly work with teams. 
 
 In the direcotry /usr/src/freeswitch-teams/freeswitch
 
