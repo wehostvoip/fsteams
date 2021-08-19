@@ -46,6 +46,9 @@ ufw allow in from 52.114.132.46/32 to any port 5067 proto tcp
 ufw allow in from 52.112.0.0/14 to any port 16384:32768 proto udp
 ```
 
+#### Please add below the ports to open for your SIP server SIP and RTP ports
+
+
 ### 4 - FreeSwitch Configuration
 
 In the /usr/src/freeswitch-teams directory run the install.sh program, this program will clear the default configuration fo Freeswitch and remove unnecessary profiles and dial plans
