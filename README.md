@@ -10,7 +10,7 @@ cd /usr/src/freeswitch-teams/freeswitch
 
 ### 2 - The FreeSwitch contained in the project must be compiled on a Debian 10 platform. It contains a few modifications in the sofia module to properly work with teams. 
 
-In the direcotry /usr/src/freeswitch-teams/freeswitch
+In the directory /usr/src/freeswitch-teams/freeswitch
 
 ```shell
 ./bootstrap.sh -j
