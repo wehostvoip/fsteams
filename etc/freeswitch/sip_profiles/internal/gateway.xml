@@ -1,0 +1,14 @@
+<include>
+  <gateway name="client_gateway">
+  	<param name="username" value="tgw"/>
+  	<param name="from-domain" value="tgw.sippulse.com"/>
+  	<param name="password" value="#supersecret#"/>
+  	<param name="proxy" value="ssw.api4com.com:9999"/>
+ 	<param name="register" value="false"/>
+  	<param name="register-transport" value="udp"/>
+	<param name="contact-host" value="tgw.sippulse.com"/>
+	<param name="extension-in-contact" value="true"/>
+	<param name="extension" value="sbc"/>
+	<param name="contact-in-ping" value="true"/>
+  </gateway>
+</include>

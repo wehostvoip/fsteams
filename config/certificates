@@ -1,0 +1,8 @@
+#Certificates
+certbot certonly --standalone --preferred-challenges http -d ${SBC_FQDN}
+cat /etc/letsencrypt/live/${SBC_FQDN}/fullchain.pem >/etc/freeswitch/tls/${SBC_FQDN}/agent.pem
+cat /etc/letsencrypt/live/${SBC_FQDN}/privkey.pem >>/etc/freeswitch/tls/${SBC_FQDN}/agent.pem
+cat /etc/freeswitch/tls/bc2025.pem >>/etc/freeswitch/tls/${SBC_FQDN}/cafile.pem
+cat /etc/freeswitch/tls/dstroot.pem >>/etc/freeswitch/tls/${SBC_FQDN}/cafile.pem
+cat /etc/freeswitch/tls/${SBC_FQDN}/cert.pem >>/etc/freeswitch/tls/${SBC_FQDN}/cafile.pem
+

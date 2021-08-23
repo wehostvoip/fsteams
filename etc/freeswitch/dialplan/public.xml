@@ -1,0 +1,155 @@
+<!--
+    NOTICE:
+
+    This context is usually accessed via the external sip profile listening on port 5080.
+    
+    It is recommended to have separate inbound and outbound contexts.  Not only for security
+    but clearing up why you would need to do such a thing.  You don't want outside un-authenticated
+    callers hitting your default context which allows dialing calls thru your providers and results 
+    in Toll Fraud.
+-->
+
+<!-- http://wiki.freeswitch.org/wiki/Dialplan_XML -->
+<include>
+  <context name="public">
+
+    <extension name="unloop">
+      <condition field="${unroll_loops}" expression="^true$"/>
+      <condition field="${sip_looped_call}" expression="^true$">
+	<action application="deflect" data="${destination_number}"/>
+      </condition>
+    </extension>
+    <!--
+	Tag anything pass thru here as an outside_call so you can make sure not
+	to create any routing loops based on the conditions that it came from 
+	the outside of the switch.  
+    -->
+    <extension name="outside_call" continue="true">
+      <condition>
+	<action application="set" data="outside_call=true"/>
+	<action application="export" data="RFC2822_DATE=${strftime(%a, %d %b %Y %T %z)}"/>
+      </condition>
+    </extension>
+
+    <extension name="call_debug" continue="true">
+      <condition field="${call_debug}" expression="^true$" break="never">
+	<action application="info"/>
+      </condition>
+    </extension>
+    
+    <extension name="refer-incompleto">
+      <condition field="destination_number" expression="Z">
+      <!--<condition field="${sip_refer_to}">
+        <expression><![CDATA[<sip:Z(.*);(.*)>]]></expression>-->
+	<action application="set" data="proxy_media=false"/>
+ 	<action application="set" data="bypass_media=false"/>
+ 	<action application="export" data="add_ice_candidates=true"/>
+	<action application="export" data="rtcp_audio_interval_msec=5000"/>
+	<action application="export" data="confirm_blind_transfer=true"/>
+	<action application="export" data="rtcp_mux=true"/>
+        <action application="info"/>
+        <action application="unset" data="sip_h_X-FS-Refer-Params" />
+        <action application="unset" data="sip_h_X-FS-Support" />
+        <action application="unset" data="sip_h_Allow-Events" />
+	<!--<action application="export" data="nolocal:sip_invite_req_uri=$1;$2"/> -->
+	<action application="export" data="sip_cid_type=none"/>
+	<action application="export" data="sdp_m_per_ptime=false"/>
+	<action application="export" data="rtp_secure_media=optional:AES_CM_128_HMAC_SHA1_80"/>
+	<action application="export" data="rtp_secure_media_outbound=true"/>
+	<action application="export" data="extension-in-contact=true"/>	
+	<action application="export" data="extension=tgw"/>	
+	<action application="bridge" data="sofia/teams/0@${sip_refer_to}"/>
+      </condition>
+    </extension>
+    
+    <extension name="refer-completo">
+      <condition field="${sip_refer_to}">
+        <expression><![CDATA[<sip:(.*)@(.*);(.*)>]]></expression>
+        <action application="set" data="refer_user=$1" />
+        <action application="set" data="refer_domain=$2" />
+        <action application="set" data="refer_params=$3" />
+	<action application="export" data="rtcp_audio_interval_msec=5000"/>
+	<action application="export" data="rtcp_mux=true"/>
+ 	<action application="export" data="add_ice_candidates=true"/>
+        <action application="info"/>
+        <action application="unset" data="sip_h_X-FS-Refer-Params" />
+        <action application="unset" data="sip_h_Allow-Events" />
+	<action application="export" data="nolocal:sip_invite_params=$3"/>
+	<action application="export" data="sdp_m_per_ptime=false"/>
+	<action application="export" data="rtp_secure_media=optional:AES_CM_128_HMAC_SHA1_80"/>
+	<action application="export" data="rtp_secure_media_outbound=true"/>
+	<action application="export" data="extension-in-contact=true"/>	
+	<action application="export" data="extension=tgw"/>	
+	<action application="export" data="sip_cid_type=none"/>
+	<action application="bridge" data="sofia/teams/${refer_user}@${refer_domain}"/>
+      </condition>
+    </extension>
+
+    <extension name="from-sip">
+	<!--<condition field="${sip_src_address}" expression="^(4833328[0-9]{3})$">-->
+	<condition field="destination_number" expression="^(4833328[0-9]{3})$">
+		<action application="set" data="proxy_media=false"/>
+ 		<action application="set" data="bypass_media=false"/>
+ 		<action application="export" data="add_ice_candidates=true"/>
+ 		<!--<action application="export" data="ice_lite=true"/>-->
+		<action application="export" data="rtcp_audio_interval_msec=5000"/>
+		<action application="export" data="rtcp_mux=true"/>
+		<action application="export" data="zrtp_secure_media=false"/>
+		<action application="export" data="sdp_m_per_ptime=true"/>
+        	<action application="unset" data="sip_h_Allow-Events" />
+		<action application="export" data="rtp_secure_media=optional:AES_CM_128_HMAC_SHA1_80"/>
+		<action application="export" data="rtp_secure_media_outbound=true"/>
+		<action application="export" data="rtp_secure_media_inbound=false"/>
+		<action application="export" data="sip_cid_type=pid"/>
+        	<action application="info"/>
+		<action application="bridge" data="sofia/gateway/ms1/+55$1"/>
+	</condition>
+    </extension>
+    
+    <extension name="from-teams">
+	<!--<condition field="${sip_from_host}" expression="sip.pstnhub.microsoft.com"/>-->
+	<condition field="destination_number" expression="^\+55([2-9][0-9][2-9][0-9]{7,8})$">
+		<action application="set" data="proxy_media=false"/>
+ 		<action application="set" data="bypass_media=false"/>
+		<action application="export" data="rtcp_audio_interval_msec=5000"/>
+		<action application="export" data="rtcp_mux=true"/>
+		<action application="export" data="confirm_blind_transfer=true"/>
+ 		<action application="set" data="add_ice_candidates=false"/>
+		<action application="export" data="zrtp_secure_media=false"/>
+        	<action application="unset" data="sip_h_X-FS-Refer-Params" />
+        	<action application="unset" data="sip_h_X-FS-Support" />
+		<action application="export" data="sdp_m_per_ptime=false"/>
+		<action application="export" data="rtp_secure_media=optional:AES_CM_128_HMAC_SHA1_80"/>
+		<action application="export" data="rtp_secure_media_outbound=false"/>
+		<action application="export" data="rtp_secure_media_inbound=true"/>
+		<action application="export" data="sip_cid_type=pid"/>
+        	<action application="info"/>
+		<action application="bridge" data="sofia/gateway/client_gateway/11740$1"/>
+	</condition>
+    </extension>
+    
+
+
+    <!--
+	You can place files in the public directory to get included.
+    -->
+    <X-PRE-PROCESS cmd="include" data="public/*.xml"/>
+    <!--
+	If you have made it this far lets challenge the caller and if they authenticate
+	lets try what they dialed in the default context. (commented out by default)
+    -->
+    <!--
+    <extension name="check_auth" continue="true">
+      <condition field="${sip_authorized}" expression="^true$" break="never">
+	<anti-action application="respond" data="407"/>
+      </condition>
+    </extension>
+    
+    <extension name="transfer_to_default">
+      <condition>
+	<action application="transfer" data="${destination_number} XML default"/>
+      </condition>
+    </extension>
+    -->
+  </context>
+</include>

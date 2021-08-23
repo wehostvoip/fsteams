@@ -1,0 +1,13 @@
+<include>
+  <context name="transfer">
+
+    <extension name="refer">
+      <condition field="${sip_refer_to}" expression=".*">
+        <action application="info"/>
+	<!--<action application="export" data="nolocal:sip_invite_params=$3"/>-->
+        <!--<action application="bridge" data="sofia/${use_profile}/${refer_user}@${refer_domain}"/>-->
+      </condition>
+    </extension>
+
+  </context>
+</include>
