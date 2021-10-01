@@ -1,0 +1,5 @@
+<include>
+    <list name="peers" default="deny">
+      <node type="allow" cidr="3.80.16.0/23"/>
+    </list>
+</include>

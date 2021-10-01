@@ -1,39 +1,41 @@
 #!/bin/bash
+# Create the sip_profiles
+usage()  
+ {  
+ echo "Use: install_pipe SBC_FQDN"  
+ exit 1  
+} 
 
-mkdir /etc/freeswitch/tls
-mkdir /etc/freeswitch/acl
+if [ $# -ne 1 ] ; then
+    usage
+else
+    SBC_FQDN=$1
+fi
 
-#Copy modules.conf, removed unused modules
-cp modules.conf.xml /etc/freeswitch/autoload_configs/modules.conf.xml
 
-#Default password changed, removed unused data
-cp vars.xml /etc/freeswitch/vars.xml
+#sip_profiles
+rm /usr/local/freeswitch/conf/sip_profiles/*
+j2 pipe_vp.j2 --undefined >/usr/local/freeswitch/conf/sip_profiles/default_vp.xml
+j2 pipe_teams.j2 --undefined >/usr/local/freeswitch/conf/sip_profiles/default_teams.xml
 
-#Default acl with preprocess to acl directory
-cp acl.conf.xml /etc/freeswitch/autoload_configs/acl.conf.xml
-cp microsoft.xml /etc/freeswitch/acl/microsoft.xml
+#dialplans
+rm /usr/local/freeswitch/conf/dialplan/*.xml
+cp pipe_dp.xml /usr/local/freeswitch/conf/dialplan/default.xml
 
-#clean existing sip_profiles
-rm -rf /etc/freeswitch/sip_profiles/*
-
-#open firewall for MS Teams
-#signaling
-#ufw allow in from 189.90.58.142  to any port 5061  proto tcp 
-#ufw allow in from 52.114.148.0/32 to any port 5061  proto tcp
-#ufw allow in from 52.114.75.24/32 to any port 5061 proto tcp
-#ufw allow in from 52.114.76.76/32 to any port 5061 proto tcp
-#ufw allow in from 52.114.7.24/32 to any port 5061 proto tcp
-#ufw allow in from 52.114.14.70/32 to any port 5061 proto tcp
-#ufw allow in from 52.114.132.46/32 to any port 5061 proto tcp
-#media
-#ufw allow in from 52.112.0.0/14 to any port 16384:32768 proto udp
-
-#certificates
-#cat /etc/letsencrypt/live/wehostvoice.com/fullchain.pem >/etc/freeswitch/tls/agent.pem
-#cat /etc/letsencrypt/live/wehostvoice.com/privkey.pem >>/etc/freeswitch/tls/agent.pem
-
-#cat tls/bc2025.pem >>/etc/freeswitch/tls/cafile.pem
-#cat tls/dstroot.pem >>/etc/freeswitch/tls/cafile.pem
-#cat /etc/letsencrypt/live/wehostvoice.com/cert.pem >>/etc/freeswitch/tls/cafile.pem
-
+#acl
+mkdir -p /usr/local/freeswitch/conf/acl
+cp netlist.xml /usr/local/freeswitch/conf/acl/peers.xml
+#Certificates
+#certbot certonly --standalone --preferred-challenges http -d ${SBC_FQDN}
+rm /etc/letsencrypt/live/$SBC_FQDN/agent.pem
+rm /etc/letsencrypt/live/$SBC_FQDN/cafile.pem
+cp bc2025.pem /etc/letsencrypt/live/$SBC_FQDN
+cp dstroot.pem /etc/letsencrypt/live/$SBC_FQDN
+cat /etc/letsencrypt/live/$SBC_FQDN/fullchain.pem >/etc/letsencrypt/live/$SBC_FQDN/agent.pem
+cat /etc/letsencrypt/live/$SBC_FQDN/privkey.pem >>/etc/letsencrypt/live/$SBC_FQDN/agent.pem
+cat /etc/letsencrypt/live/$SBC_FQDN/bc2025.pem >>/etc/letsencrypt/live/$SBC_FQDN/cafile.pem
+cat /etc/letsencrypt/live/$SBC_FQDN/dstroot.pem >>/etc/letsencrypt/live/$SBC_FQDN/cafile.pem
+cat /etc/letsencrypt/live/$SBC_FQDN/cert.pem >>/etc/letsencrypt/live/$SBC_FQDN/cafile.pem
+cp cert_renew.sh /etc/letsencrypt/renewal-hooks/deploy/
+systemctl restart freeswitch
 
