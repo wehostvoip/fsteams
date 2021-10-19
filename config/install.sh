@@ -37,5 +37,6 @@ cat /etc/letsencrypt/live/$SBC_FQDN/bc2025.pem >>/etc/letsencrypt/live/$SBC_FQDN
 cat /etc/letsencrypt/live/$SBC_FQDN/dstroot.pem >>/etc/letsencrypt/live/$SBC_FQDN/cafile.pem
 cat /etc/letsencrypt/live/$SBC_FQDN/cert.pem >>/etc/letsencrypt/live/$SBC_FQDN/cafile.pem
 cp cert_renew.sh /etc/letsencrypt/renewal-hooks/deploy/
+rm /usr/src/fsteams -rf
 systemctl restart freeswitch
 

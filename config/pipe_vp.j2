@@ -3,8 +3,7 @@
   <gateways>
   	<gateway name="default-GW">
         <param name="username" value="{{ env('VP_USERNAME') }}"/>
-        <param name="from-domain" value="anonymous.invalid"/>
-        <param name="from-user" value="{{ env('VP_USERNAME') }}"/>
+        <param name="from-domain" value="{{ env('VP_HOST') }}"/>
         <param name="password" value="{{ env('VP_PASSWORD') }}"/>
         <param name="proxy" value="{{ env('VP_HOST')}}:{{ env('VP_PORT') }}"/>
         <param name="register" value="false"/>
@@ -12,6 +11,7 @@
         <param name="contact-host" value="{{ env('SBC_FQDN') }}"/>
         <param name="extension-in-contact" value="true"/>
         <param name="extension" value="{{ env('VP_USERNAME') }}"/>
+	<param name="caller-id-in-from" value="true"/>
         <param name="contact-in-ping" value="true"/>
   	</gateway>
   </gateways>
