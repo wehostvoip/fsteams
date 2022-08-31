@@ -1,6 +1,10 @@
-## Mircosoft Teams Direct Routing Gateway
+## Direct Routing Gateway for Microsoft Teams
 
 The purpose of gateway teams is to convert UDP/RTP traffic to TLS/SRTP and allow MS Teams forward signaling. For the operation you will have to follow a series of steps carefully. 
+
+## Installation Assistance
+
+Please send an e-mail to cloud@wehostvoip.io if you need assistance in the configuration of this server. Normally it takes a full day to install, mainly waiting for the synchronization of MS Teams. The onboarding assistance is charged separately. 
 
 ## FreeSwitch Compilation
 
@@ -33,7 +37,7 @@ You will have to open the system for the microsoft ranges, below an example usin
 #temporary for Let's encrypt
 ufw allow port 80/tcp
 
-#open firewall for MS Teams
+#open firewall for MS Teams, make sure to open also the ports for your SIP server
 #signaling
 ufw allow in from 189.90.58.142  to any port 5067  proto tcp
 ufw allow in from 52.114.148.0/32 to any port 5067  proto tcp
@@ -49,7 +53,7 @@ ufw allow in from 52.112.0.0/14 to any port 16384:32768 proto udp
 #### Please add below the ports to open for your SIP server SIP and RTP ports
 
 
-### 4 - FreeSwitch Configuration
+### 4 - Configuration
 
 In the /usr/src/freeswitch-teams directory run the install.sh program, this program will clear the default configuration fo Freeswitch and remove unnecessary profiles and dial plans
 
@@ -213,3 +217,8 @@ International (When possible do not enable international calls, to avoid fraud o
 ```
 New-CsOnlineVoiceRoute -Identity "Internacional LD" -NumberPattern
 ```
+
+## Microsoft Certification
+
+This product is not certified by Microsoft. Use at your own risk. 
+
